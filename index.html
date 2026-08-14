@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#155e75">
+  <title>北部ジュニア きづき GAME NOTE</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root{--ink:#17352d;--muted:#677a74;--bg:#f4f7f5;--card:#fff;--brand:#176b52;--brand2:#125b46;--ok:#15803d;--warn:#b45309;--bad:#b91c1c;--line:#d7e4df;--shadow:0 8px 24px #19413517}
+    *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic","Noto Sans JP",sans-serif;min-height:100vh}
+    button,input,select,textarea{font:inherit;font-size:16px} button{cursor:pointer} .wrap{width:min(100%,920px);margin:auto;padding:env(safe-area-inset-top) 14px calc(88px + env(safe-area-inset-bottom))}
+    header{background:linear-gradient(135deg,#125b46,#238164);color:white;padding:calc(18px + env(safe-area-inset-top)) 18px 20px;margin:0 -14px 16px;border-radius:0 0 24px 24px}.eyebrow{font-size:12px;font-weight:800;letter-spacing:.18em;opacity:.82}h1{font-size:clamp(22px,6vw,34px);margin:4px 0}.sub{opacity:.88;font-size:13px}
+    .statusbar{position:sticky;top:0;z-index:5;display:flex;gap:8px;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:14px;background:#fffffff2;box-shadow:var(--shadow);backdrop-filter:blur(12px)}
+    .status{display:flex;align-items:center;gap:7px;font-weight:800;font-size:13px}.dot{width:10px;height:10px;border-radius:99px;background:#94a3b8}.online .dot{background:#22c55e;box-shadow:0 0 0 4px #dcfce7}.offline .dot{background:#f59e0b}.pending{font-size:12px;color:var(--warn)}
+    .event-summary{display:flex;align-items:center;justify-content:space-between;gap:12px}.event-summary-text{min-width:0;font-weight:900;line-height:1.55}.event-summary-text span{overflow-wrap:anywhere}.event-edit{margin-top:12px}.event-edit-actions{display:flex;gap:8px;margin-top:12px}.event-edit-actions .primary{flex:1}.hidden{display:none!important}
+    .tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:14px 0}.tab{border:0;border-radius:12px;padding:12px 5px;background:#dce9ed;color:var(--brand2);font-weight:800}.tab.active{background:var(--brand2);color:white}
+    .panel{display:none}.panel.active{display:block}.card{background:var(--card);border:1px solid #ffffffaa;border-radius:18px;padding:16px;margin:12px 0;box-shadow:var(--shadow)}h2{font-size:19px;margin:0 0 14px}h3{font-size:16px;margin:0 0 10px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{display:flex;flex-direction:column;gap:6px}.field.full{grid-column:1/-1}label{font-size:13px;font-weight:800;color:#334155}input,select,textarea{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px;background:white;color:var(--ink)}textarea{min-height:86px;resize:vertical}.hint{font-size:12px;color:var(--muted)}
+    .seg,.chips{display:flex;flex-wrap:wrap;gap:8px}.choice,.chip{border:1px solid var(--line);border-radius:999px;background:#f8fafc;padding:10px 13px;font-weight:700}.choice.active,.chip.active{border-color:var(--brand);background:#cffafe;color:#155e75}.choice[data-value="できた"].active{background:#dcfce7;color:#166534;border-color:#86efac}.choice[data-value="気になった"].active{background:#fef3c7;color:#92400e;border-color:#fcd34d}.choice[data-value="次にやる"].active{background:#fee2e2;color:#991b1b;border-color:#fca5a5}
+    .scores{display:grid;grid-template-columns:60px 1fr 26px 1fr 40px;gap:8px;align-items:center}.scores input{text-align:center;font-size:22px;font-weight:800;padding:10px 4px}.scores .vs{text-align:center;color:var(--muted)}.remove-game{border:0;background:#f6eaea;color:#b91c1c;width:38px;height:38px;border-radius:11px;font-weight:900}.add-game{width:100%;min-height:48px;border:2px dashed #9fbdb2;background:#f7fbf9;color:var(--brand);border-radius:13px;font-weight:800;margin-top:9px}.pick-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:8px}.pick{min-height:50px;border:2px solid var(--line);background:#fff;color:var(--ink);border-radius:14px;font-weight:800;padding:8px}.pick.active{border-color:var(--brand);background:#e8f4ef;color:var(--brand)}.addrow{display:flex;gap:8px;margin-top:9px}.addrow input{min-width:0;flex:1}.mini{border:0;background:var(--brand);color:#fff;border-radius:13px;padding:0 15px;font-weight:800;min-height:48px}
+    .primary{width:100%;border:0;border-radius:14px;padding:15px;background:linear-gradient(135deg,var(--brand),var(--brand2));color:white;font-weight:900;box-shadow:0 6px 14px #0e749044}.secondary{border:1px solid var(--line);border-radius:11px;padding:10px 12px;background:white;font-weight:700}.danger{color:var(--bad)}.edit-banner{border:2px solid #0e7490;background:#ecfeff;color:#164e63}.edit-banner h2{margin-bottom:5px}.form-actions{display:flex;gap:9px}.form-actions .primary{flex:1}.record-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:11px}.record-actions button{padding:8px 13px}.record-actions .delete-record{border-color:#fecaca;background:#fff7f7;color:var(--bad)}
+    .summary{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.metric{text-align:center;background:#eff6f7;border-radius:12px;padding:12px 4px}.metric b{display:block;font-size:23px}.metric span{font-size:11px;color:var(--muted)}
+    .filters{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}.record{border-left:5px solid #94a3b8;padding:13px;margin:10px 0;background:#f8fafc;border-radius:10px}.record.win{border-color:#22c55e}.record.lose{border-color:#ef4444}.record-top{display:flex;justify-content:space-between;gap:8px}.record-title{font-weight:900}.meta{font-size:12px;color:var(--muted);margin-top:4px}.scoreline{font-size:18px;font-weight:900;margin:8px 0}.badge{display:inline-block;font-size:11px;font-weight:800;border-radius:999px;padding:4px 8px;background:#e2e8f0;margin:2px}.dupe{background:#fef3c7;color:#92400e}.empty{text-align:center;color:var(--muted);padding:28px 8px}.practice{background:#ecfdf5;border-radius:12px;padding:12px;margin-top:10px;font-size:14px}
+    details summary{font-weight:800;cursor:pointer}.setup-grid{display:grid;gap:10px;margin-top:12px}.setup-ok{border-left:5px solid #22c55e}.actions{display:flex;gap:8px;flex-wrap:wrap}.toast{position:fixed;z-index:20;left:50%;bottom:22px;transform:translateX(-50%) translateY(120px);background:#102f3c;color:white;padding:12px 18px;border-radius:999px;transition:.25s;box-shadow:var(--shadow);max-width:90%;text-align:center}.toast.show{transform:translateX(-50%) translateY(0)}
+    @media(max-width:560px){.grid{grid-template-columns:1fr}.field.full{grid-column:auto}.summary{grid-template-columns:repeat(2,1fr)}.filters{grid-template-columns:1fr}.wrap{padding-left:10px;padding-right:10px}.card{padding:14px}.scores{grid-template-columns:48px 1fr 18px 1fr 38px}header{margin-left:-10px;margin-right:-10px}}
+    @media print{body{background:white}.statusbar,.tabs,#entryPanel,#setupCard,.actions{display:none!important}.panel{display:block!important}.wrap{max-width:none;padding:0}.record{break-inside:avoid}.card{box-shadow:none;border:1px solid #ccc}}
+  </style>
+</head>
+<body>
+<main class="wrap">
+  <header><div class="eyebrow">HOKUBU JUNIOR</div><h1>きづき GAME NOTE</h1><div class="sub">大会テスト版・みんなで共有</div></header>
+  <div class="statusbar"><div id="connection" class="status offline"><span class="dot"></span><span>未接続</span></div><div id="pendingCount" class="pending"></div></div>
+
+  <section id="eventSettings" class="card">
+    <div id="eventSummary" class="event-summary hidden">
+      <div><div class="hint">本日の設定</div><div class="event-summary-text"><span id="eventSummaryTournament"></span>｜<span id="eventSummaryVenue"></span>｜<span id="eventSummaryDate"></span></div></div>
+      <button id="editEvent" class="secondary" type="button">変更</button>
+    </div>
+    <div id="eventEdit" class="event-edit">
+      <h2>本日の設定</h2>
+      <div class="grid">
+        <div class="field full"><label>大会名</label><input id="tournament" required placeholder="例：夏季練習試合"></div>
+        <div class="field"><label>開催日</label><input id="eventDate" type="date" required></div>
+        <div class="field"><label>会場</label><input id="venue" placeholder="例：北部体育館"></div>
+      </div>
+      <div class="event-edit-actions"><button id="saveEvent" class="primary" type="button">この設定を保存</button><button id="cancelEvent" class="secondary hidden" type="button">キャンセル</button></div>
+      <div class="hint" style="margin-top:8px">この端末に保存し、以後の試合へ自動で引き継ぎます。</div>
+    </div>
+  </section>
+
+  <details id="setupCard" class="card">
+    <summary>接続設定</summary>
+    <div class="setup-grid">
+      <div class="field"><label>Supabase Project URL</label><input id="supabaseUrl" inputmode="url" placeholder="https://xxxxx.supabase.co"></div>
+      <div class="field"><label>Publishable key</label><input id="supabaseKey" type="password" placeholder="sb_publishable_..."><div class="hint">Secret key / service_role key は入力しないでください。</div></div>
+      <button id="connectBtn" class="primary" type="button">接続する</button>
+    </div>
+  </details>
+
+  <nav class="tabs"><button class="tab active" data-tab="entry">記録する</button><button class="tab" data-tab="today">今日・集計</button><button class="tab" data-tab="all">全履歴</button></nav>
+
+  <section id="entry" class="panel active">
+    <form id="gameForm">
+      <div id="editBanner" class="card edit-banner hidden"><h2 id="editTitle">編集中</h2><div class="hint">内容を直して「変更を保存」を押してください。</div></div>
+      <div class="card"><h2>試合情報</h2><div class="grid">
+        <div class="field"><label>コート番号 <span class="hint">（任意）</span></label><input id="court" inputmode="numeric" placeholder="例：3"></div>
+        <div class="field"><label>試合開始時刻 <span class="hint">（任意）</span></label><input id="startedAt" type="time"></div>
+        <div class="field full"><div class="hint">未入力でも保存できます。記録を保存した時刻は自動で残ります。</div></div>
+      </div></div>
+      <div class="card"><h2>入力する人・選手</h2><label>入力する保護者</label><div id="observerChoices" class="pick-grid" style="margin-top:7px"></div><label style="display:block;margin-top:14px">試合をした選手</label><div id="playerChoices" class="pick-grid" style="margin-top:7px"></div><div class="addrow"><input id="newPlayer" maxlength="20" placeholder="選手の名前を追加"><button id="addPlayer" class="mini" type="button">追加</button></div><div class="hint">担当は固定しません。見ていた人が入力してください。重複しても保存できます。</div></div>
+      <div class="card"><h2>対戦</h2><div class="field"><label>対戦相手</label><input id="opponent" required autocomplete="off" maxlength="30" placeholder="例：中山さん、〇〇クラブの選手"></div>
+      <div style="height:14px"></div><h3>ゲームスコア <span class="hint">（左が選んだ選手）</span></h3><div id="scoreRows"></div><button id="addGame" class="add-game" type="button">＋ ゲームを追加</button><div id="resultPreview" class="hint" style="margin-top:8px">スコアから勝敗を自動判定します</div></div>
+      <div class="card"><h2>3タップ振り返り</h2>
+        <div class="seg" id="reflectionChoices"><button type="button" class="choice" data-value="できた">できた</button><button type="button" class="choice" data-value="気になった">気になった</button><button type="button" class="choice" data-value="次にやる">次にやる</button></div>
+        <div style="height:16px"></div><label>カテゴリ（複数可）</label><div class="chips" id="tagChoices"></div>
+        <div class="field" style="margin-top:14px"><label>本人ひとこと</label><textarea id="comment" placeholder="試合のあとに本人が話したこと"></textarea></div>
+      </div>
+      <div class="form-actions"><button id="submitGame" class="primary" type="submit">この試合を記録する</button><button id="cancelEdit" class="secondary hidden" type="button">編集をキャンセル</button></div>
+    </form>
+  </section>
+
+  <section id="today" class="panel"><div class="card"><h2>今日の試合</h2><div id="todaySummary" class="summary"></div><div id="todayList"></div></div><div class="card"><h2>次の練習</h2><div id="practice"></div></div></section>
+  <section id="all" class="panel"><div class="card"><h2>全選手の共有一覧</h2><div class="filters"><select id="filterPlayer"><option value="">全選手</option></select><select id="filterEnteredBy"><option value="">全入力者</option></select></div><div class="actions"><button id="exportCsv" type="button" class="secondary">CSV書き出し</button><button id="exportJson" type="button" class="secondary">JSONバックアップ</button><button type="button" class="secondary" onclick="window.print()">印刷</button></div><div id="allList"></div></div></section>
+</main><div id="toast" class="toast" role="status"></div>
+
+<script>
+(() => {
+  'use strict';
+  const PLAYERS=['選手A','選手B','選手C','選手D','選手E'];
+  const GUARDIANS=['保護者A','保護者B','保護者C','保護者D','保護者E'];
+  const TAGS=['サーブ','レシーブ','前','後ろ','フットワーク','ラリー','メンタル'];
+  const PRACTICE={サーブ:'同じフォームから狙うコースを変えるサーブ練習',レシーブ:'相手の打点を見て、短く返す・奥へ返すを打ち分ける',前:'ネット前でラケットを上げ、早い打点で触る練習',後ろ:'奥へ下がる一歩目と、体の前で打つ準備を確認',フットワーク:'打った後に中央へ戻るところまでを1セットで練習',ラリー:'まず3球つなぎ、余裕が出たらコースを狙う',メンタル:'1点ごとに深呼吸し、次の1球の作戦を言葉にする'};
+  // 公開用の接続先。Supabase作成後に publishable key だけを設定します。
+  const DEFAULT_SUPABASE={url:'https://rkuzsznwvjovhagnlkyx.supabase.co',key:'sb_publishable_YHAAODGrd7nKuBnxL47gvA_CN2MlfvS'};
+  const STORAGE={config:'kizuki_rt_config_v1',guardian:'kizuki_guardian_v1',event:'kizuki_event_v1',queue:'kizuki_queue_v1',cache:'kizuki_shared_cache_v1',players:'kizuki_players_v1'};
+  const $=id=>document.getElementById(id); const q=(s,p=document)=>[...p.querySelectorAll(s)];
+  let db=null, channel=null, records=read(STORAGE.cache,[]), reflection='', selectedTags=new Set(), selectedPlayer='', selectedObserver=localStorage.getItem(STORAGE.guardian)||'', players=[...new Set([...PLAYERS,...read(STORAGE.players,[])])], savedEvent=null, editingClientId=null;
+
+  function read(key,fallback){try{return JSON.parse(localStorage.getItem(key)) ?? fallback}catch{return fallback}}
+  function write(key,value){localStorage.setItem(key,JSON.stringify(value))}
+  function esc(v=''){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+  function toast(message){$('toast').textContent=message;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2400)}
+  function uuid(){return crypto.randomUUID ? crypto.randomUUID() : Date.now()+'-'+Math.random().toString(16).slice(2)}
+  function localDate(){const d=new Date();return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-')}
+
+  function initOptions(){
+    $('filterPlayer').innerHTML='<option value="">全選手</option>'+players.map(x=>`<option>${x}</option>`).join('');
+    $('filterEnteredBy').innerHTML='<option value="">全入力者</option>'+GUARDIANS.map(x=>`<option>${x}</option>`).join('');
+    $('tagChoices').innerHTML=TAGS.map(x=>`<button type="button" class="chip" data-tag="${x}">${x}</button>`).join('');
+    renderPickers();addGame();
+  }
+  function renderPickers(){
+    $('observerChoices').innerHTML=GUARDIANS.map(x=>`<button type="button" class="pick ${x===selectedObserver?'active':''}" data-observer="${esc(x)}">${esc(x)}</button>`).join('');
+    $('playerChoices').innerHTML=players.map(x=>`<button type="button" class="pick ${x===selectedPlayer?'active':''}" data-player="${esc(x)}">${esc(x)}</button>`).join('');
+    q('[data-observer]').forEach(b=>b.onclick=()=>{selectedObserver=b.dataset.observer;localStorage.setItem(STORAGE.guardian,selectedObserver);renderPickers()});
+    q('[data-player]').forEach(b=>b.onclick=()=>{selectedPlayer=b.dataset.player;renderPickers()});
+  }
+  function addPlayer(){const name=$('newPlayer').value.trim();if(!name)return toast('名前を入力してください');if(!players.includes(name))players.push(name);write(STORAGE.players,players.filter(x=>!PLAYERS.includes(x)));selectedPlayer=name;$('newPlayer').value='';renderPickers();if(![...$('filterPlayer').options].some(x=>x.value===name))$('filterPlayer').add(new Option(name,name));toast(`${name}さんを追加しました`)}
+  function addGame(){const i=q('.scores').length;if(i>=3)return toast('3ゲームまで入力できます');$('scoreRows').insertAdjacentHTML('beforeend',`<div class="scores"><b>第${i+1}G</b><input class="myScore" type="number" inputmode="numeric" min="0" max="99" aria-label="第${i+1}ゲーム 自分"><span class="vs">−</span><input class="theirScore" type="number" inputmode="numeric" min="0" max="99" aria-label="第${i+1}ゲーム 相手"><button type="button" class="remove-game" aria-label="ゲーム削除">×</button></div>`);bindGames();preview()}
+  function bindGames(){q('.scores').forEach((r,i)=>{r.querySelector('b').textContent=`第${i+1}G`;r.querySelectorAll('input')[0].setAttribute('aria-label',`第${i+1}ゲーム 自分`);r.querySelectorAll('input')[1].setAttribute('aria-label',`第${i+1}ゲーム 相手`)});q('.remove-game').forEach(b=>{b.style.visibility=q('.scores').length===1?'hidden':'visible';b.onclick=()=>{b.closest('.scores').remove();bindGames();preview()}})}
+  function restore(){
+    const c=read(STORAGE.config,{});$('supabaseUrl').value=c.url||DEFAULT_SUPABASE.url;$('supabaseKey').value=c.key||DEFAULT_SUPABASE.key;
+    const e=read(STORAGE.event,{});savedEvent=e.tournament&&e.date?{tournament:e.tournament,date:e.date,venue:e.venue||''}:null;$('tournament').value=e.tournament||'';$('eventDate').value=e.date||localDate();$('venue').value=e.venue||'';$('court').value=e.court||'';renderEventSettings();
+  }
+  function renderEventSettings(editing=!savedEvent){
+    $('eventSummary').classList.toggle('hidden',editing||!savedEvent);$('eventEdit').classList.toggle('hidden',!editing);$('cancelEvent').classList.toggle('hidden',!savedEvent);
+    if(savedEvent){$('eventSummaryTournament').textContent=savedEvent.tournament;$('eventSummaryVenue').textContent=savedEvent.venue||'会場未設定';$('eventSummaryDate').textContent=savedEvent.date}
+  }
+  function saveEventSettings(){
+    const tournament=$('tournament').value.trim(),date=$('eventDate').value,venue=$('venue').value.trim();if(!tournament)return toast('大会名を入力してください');if(!date)return toast('開催日を入力してください');
+    savedEvent={tournament,date,venue};const old=read(STORAGE.event,{});write(STORAGE.event,{...old,...savedEvent});renderEventSettings(false);toast('本日の設定を保存しました');
+  }
+  function editEventSettings(){$('tournament').value=savedEvent?.tournament||'';$('eventDate').value=savedEvent?.date||localDate();$('venue').value=savedEvent?.venue||'';renderEventSettings(true);$('tournament').focus()}
+  function cancelEventSettings(){if(!savedEvent)return;$('tournament').value=savedEvent.tournament;$('eventDate').value=savedEvent.date;$('venue').value=savedEvent.venue;renderEventSettings(false)}
+  function setStatus(kind,text){$('connection').className='status '+kind;$('connection').querySelector('span:last-child').textContent=text}
+  function updatePending(){const n=read(STORAGE.queue,[]).length;$('pendingCount').textContent=n?`送信待ち ${n}件`:''}
+
+  async function connect(){
+    const url=$('supabaseUrl').value.trim(),key=$('supabaseKey').value.trim();
+    if(!url||!key){setStatus('offline','未接続（端末保存）');return}
+    if(!window.supabase){setStatus('offline','通信ライブラリ未読込');return}
+    write(STORAGE.config,{url,key}); setStatus('offline','接続中…');
+    try{
+      if(channel&&db) await db.removeChannel(channel);
+      db=window.supabase.createClient(url,key,{auth:{persistSession:false}});
+      await loadRecords();
+      channel=db.channel('game-notes-shared').on('postgres_changes',{event:'*',schema:'public',table:'game_notes'},()=>loadRecords()).subscribe(status=>{if(status==='SUBSCRIBED')setStatus('online','共有中')});
+      $('setupCard').open=false; await flushQueue();
+    }catch(err){console.error(err);setStatus('offline','オフライン');toast('接続できません。設定を確認してください')}
+  }
+  async function loadRecords(){
+    if(!db)return; const {data,error}=await db.from('game_notes').select('*').order('created_at',{ascending:false}).limit(1000); if(error)throw error;
+    records=data||[];write(STORAGE.cache,records);renderAll();setStatus('online','共有中');
+  }
+  async function flushQueue(){
+    if(!db||!navigator.onLine)return; let queue=read(STORAGE.queue,[]); if(!queue.length)return;
+    const remaining=[]; for(const item of queue){const {error}=await db.from('game_notes').insert(item);if(error&&error.code!=='23505')remaining.push(item)}
+    write(STORAGE.queue,remaining);updatePending();if(!remaining.length){toast('送信待ちの記録を共有しました');await loadRecords()}
+  }
+  function scoresFromForm(){return q('.scores').map(r=>{const a=r.querySelector('.myScore').value,b=r.querySelector('.theirScore').value;return a===''&&b===''?null:{my:Number(a),their:Number(b)}}).filter(Boolean)}
+  function scoreError(){const rows=q('.scores'),partial=rows.some(r=>(r.querySelector('.myScore').value==='')!==(r.querySelector('.theirScore').value===''));if(partial)return '左右両方のゲームスコアを入力してください';const s=scoresFromForm();if(!s.length)return '1ゲーム以上のスコアを入力してください';if(s.some(x=>x.my===x.their))return '同点ではないゲームスコアを入力してください';if(resultOf(s)==='DRAW')return '勝敗が決まるまでスコアを入力してください';return ''}
+  function resultOf(scores){let w=0,l=0;scores.forEach(s=>{if(s.my>s.their)w++;else if(s.my<s.their)l++});return w>l?'WIN':l>w?'LOSE':'DRAW'}
+  function preview(){const s=scoresFromForm(),r=resultOf(s);$('resultPreview').textContent=!s.length?'スコアから勝敗を自動判定します':r==='WIN'?'判定：勝ち':r==='LOSE'?'判定：負け':'判定：引き分け'}
+  async function saveGame(event){
+    event.preventDefault();if(!savedEvent&&!editingClientId){renderEventSettings(true);$('eventSettings').scrollIntoView({behavior:'smooth',block:'start'});return toast('先に本日の設定を保存してください')}if(!editingClientId&&!$('eventEdit').classList.contains('hidden'))return toast('本日の設定を保存またはキャンセルしてください');if(!selectedObserver)return toast('入力する保護者を選んでください');if(!selectedPlayer)return toast('選手を選んでください');if(!$('opponent').value.trim())return toast('対戦相手を入力してください');const problem=scoreError();if(problem)return toast(problem);const scores=scoresFromForm();if(!reflection)return toast('振り返りを1つ選んでください');if(!selectedTags.size)return toast('カテゴリを1つ以上選んでください');
+    const now=new Date().toISOString(),eventInfo=editingClientId?{tournament:$('tournament').value.trim(),date:$('eventDate').value,venue:$('venue').value.trim()}:savedEvent;if(!eventInfo.tournament||!eventInfo.date)return toast('大会名と開催日を入力してください');
+    const oldRecord=editingClientId?records.find(r=>recordKey(r)===editingClientId):null;const item={client_id:editingClientId||uuid(),tournament_name:eventInfo.tournament,event_date:eventInfo.date,venue:eventInfo.venue,court_no:$('court').value.trim(),started_at:$('startedAt').value||null,player_name:selectedPlayer,opponent_name:$('opponent').value.trim(),scores,result:resultOf(scores),reflection,tags:[...selectedTags],player_comment:$('comment').value.trim(),entered_by:selectedObserver,device_created_at:oldRecord?.device_created_at||now};
+    localStorage.setItem(STORAGE.guardian,item.entered_by);const oldEvent=read(STORAGE.event,{});write(STORAGE.event,{...oldEvent,...savedEvent,court:item.court_no});
+    if(editingClientId)return updateGame(oldRecord,item);
+    let sent=false;if(db&&navigator.onLine){try{const {error}=await db.from('game_notes').insert(item);if(!error||error.code==='23505')sent=true}catch{}}
+    if(!sent){const queue=read(STORAGE.queue,[]);queue.push(item);write(STORAGE.queue,queue);records=[{...item,id:item.client_id,created_at:now,_pending:true},...records];write(STORAGE.cache,records);setStatus('offline','オフライン');toast('端末に保存しました。接続後に自動送信します')}else{toast('共有記録に保存しました');await loadRecords()}
+    resetMatch();updatePending();renderAll();
+  }
+  async function updateGame(oldRecord,item){
+    const key=editingClientId;
+    if(isPending(oldRecord)){
+      const queue=read(STORAGE.queue,[]).map(x=>String(x.client_id)===key?{...x,...item}:x);write(STORAGE.queue,queue);
+      records=records.map(r=>recordKey(r)===key?{...r,...item,_pending:true}:r);write(STORAGE.cache,records);finishEditing();updatePending();renderAll();toast('未送信の記録を修正しました');return;
+    }
+    if(!db||!navigator.onLine){toast('共有済み記録の修正には接続が必要です');return}
+    try{
+      const changes={tournament_name:item.tournament_name,event_date:item.event_date,venue:item.venue,court_no:item.court_no,started_at:item.started_at,player_name:item.player_name,opponent_name:item.opponent_name,scores:item.scores,result:item.result,reflection:item.reflection,tags:item.tags,player_comment:item.player_comment,entered_by:item.entered_by};
+      const {data,error}=await db.from('game_notes').update(changes).eq('client_id',key).select('client_id');
+      if(error||!data?.length)throw error||new Error('更新権限を確認できません');
+      await loadRecords();finishEditing();toast('共有済み記録を修正しました');
+    }catch(err){console.error(err);toast('共有済み記録を更新できません。管理者に修正を依頼してください')}
+  }
+  function findRecord(key){return records.find(r=>recordKey(r)===String(key))}
+  function beginEdit(key){
+    const r=findRecord(key);if(!r)return toast('記録が見つかりません');editingClientId=recordKey(r);
+    $('tournament').value=r.tournament_name||'';$('eventDate').value=r.event_date||localDate();$('venue').value=r.venue||'';renderEventSettings(true);
+    $('court').value=r.court_no||'';$('startedAt').value=(r.started_at||'').slice(0,5);selectedObserver=r.entered_by||'';selectedPlayer=r.player_name||'';$('opponent').value=r.opponent_name||'';renderPickers();
+    $('scoreRows').innerHTML='';(r.scores||[]).forEach(s=>{addGame();const row=q('.scores').at(-1);row.querySelector('.myScore').value=s.my;row.querySelector('.theirScore').value=s.their});if(!(r.scores||[]).length)addGame();
+    reflection=r.reflection||'';selectedTags=new Set(r.tags||[]);q('.choice').forEach(x=>x.classList.toggle('active',x.dataset.value===reflection));q('.chip').forEach(x=>x.classList.toggle('active',selectedTags.has(x.dataset.tag)));$('comment').value=r.player_comment||'';preview();
+    $('editTitle').textContent=`編集中：${r.player_name||''} vs ${r.opponent_name||''}`;$('editBanner').classList.remove('hidden');$('cancelEdit').classList.remove('hidden');$('submitGame').textContent='変更を保存';q('.tab').find(x=>x.dataset.tab==='entry').click();$('editBanner').scrollIntoView({behavior:'smooth',block:'start'});
+  }
+  function finishEditing(){editingClientId=null;$('editBanner').classList.add('hidden');$('cancelEdit').classList.add('hidden');$('submitGame').textContent='この試合を記録する';resetMatch();restore()}
+  function cancelEditing(){if(!editingClientId)return;finishEditing();toast('編集をキャンセルしました')}
+  async function deleteGame(key){
+    const r=findRecord(key);if(!r)return toast('記録が見つかりません');const label=`${r.player_name} vs ${r.opponent_name} ${scoreText(r)}`;
+    if(!confirm(`「${label}」を削除しますか？\nこの操作は取り消せません。`))return;
+    const id=recordKey(r);
+    if(isPending(r)){
+      records=records.filter(x=>recordKey(x)!==id);write(STORAGE.cache,records);write(STORAGE.queue,read(STORAGE.queue,[]).filter(x=>String(x.client_id)!==id));if(editingClientId===id)finishEditing();updatePending();renderAll();toast('未送信の記録を削除しました');return;
+    }
+    if(!db||!navigator.onLine){toast('共有済み記録の削除には接続が必要です');return}
+    try{
+      const {data,error}=await db.from('game_notes').delete().eq('client_id',id).select('client_id');
+      if(error||!data?.length)throw error||new Error('削除権限を確認できません');
+      await loadRecords();if(editingClientId===id)finishEditing();toast('共有済み記録を削除しました');
+    }catch(err){console.error(err);toast('共有済み記録を削除できません。接続設定を確認してください')}
+  }
+  function resetMatch(){$('opponent').value='';$('startedAt').value='';$('scoreRows').innerHTML='';addGame();$('comment').value='';reflection='';selectedTags.clear();q('.choice,.chip').forEach(x=>x.classList.remove('active'));preview()}
+  function norm(s){return String(s||'').replace(/[\s　]/g,'').toLowerCase()}
+  function duplicateIds(list){const ids=new Set();for(let i=0;i<list.length;i++)for(let j=i+1;j<list.length;j++){const a=list[i],b=list[j];if(a.event_date!==b.event_date||a.player_name!==b.player_name||norm(a.opponent_name)!==norm(b.opponent_name))continue;const sameCourt=a.court_no&&a.court_no===b.court_no;const at=a.started_at?Number(a.started_at.slice(0,2))*60+Number(a.started_at.slice(3,5)):null,bt=b.started_at?Number(b.started_at.slice(0,2))*60+Number(b.started_at.slice(3,5)):null;if(sameCourt||(at!==null&&bt!==null&&Math.abs(at-bt)<=15)){ids.add(a.id);ids.add(b.id)}}return ids}
+  function scoreText(r){return (r.scores||[]).map(s=>`${s.my}-${s.their}`).join(' / ')}
+  function recordKey(r){return String(r.client_id||r.id||'')}
+  function isPending(r){const key=recordKey(r);return !!r._pending||read(STORAGE.queue,[]).some(x=>String(x.client_id)===key)}
+  function recordHtml(r,dupes){const result=r.result==='WIN'?'勝ち':r.result==='LOSE'?'負け':'引分',key=esc(recordKey(r));return `<article class="record ${r.result==='WIN'?'win':r.result==='LOSE'?'lose':''}"><div class="record-top"><div class="record-title">${esc(r.player_name)} vs ${esc(r.opponent_name)}</div><b>${result}</b></div><div class="scoreline">${esc(scoreText(r))}</div><div>${(r.tags||[]).map(t=>`<span class="badge">${esc(t)}</span>`).join('')} <span class="badge">${esc(r.reflection)}</span>${dupes.has(r.id)?'<span class="badge dupe">⚠ 重複かも</span>':''}${isPending(r)?'<span class="badge dupe">送信待ち</span>':''}</div>${r.player_comment?`<div style="margin-top:8px">「${esc(r.player_comment)}」</div>`:''}<div class="meta">${esc(r.event_date)} ${esc((r.started_at||'').slice(0,5))}　${esc(r.tournament_name)} ${r.venue?'／'+esc(r.venue):''} ${r.court_no?'／コート '+esc(r.court_no):''}<br>入力：${esc(r.entered_by)}　${new Date(r.created_at||r.device_created_at).toLocaleString('ja-JP')}</div><div class="record-actions"><button type="button" class="secondary edit-record" data-key="${key}">修正</button><button type="button" class="secondary delete-record" data-key="${key}">削除</button></div></article>`}
+  function summaryHtml(list){const w=list.filter(x=>x.result==='WIN').length,l=list.filter(x=>x.result==='LOSE').length;return `<div class="metric"><b>${list.length}</b><span>試合</span></div><div class="metric"><b>${w}</b><span>勝ち</span></div><div class="metric"><b>${l}</b><span>負け</span></div><div class="metric"><b>${new Set(list.map(x=>x.player_name)).size}</b><span>選手</span></div>`}
+  function renderAll(){
+    const dupes=duplicateIds(records),today=records.filter(r=>r.event_date===localDate());$('todaySummary').innerHTML=summaryHtml(today);$('todayList').innerHTML=today.length?today.map(r=>recordHtml(r,dupes)).join(''):'<div class="empty">今日の共有記録はまだありません</div>';
+    const p=$('filterPlayer').value,g=$('filterEnteredBy').value,filtered=records.filter(r=>(!p||r.player_name===p)&&(!g||r.entered_by===g));$('allList').innerHTML=filtered.length?summaryHtml(filtered)+filtered.map(r=>recordHtml(r,dupes)).join(''):'<div class="empty">条件に合う記録がありません</div>';
+    const counts={};today.forEach(r=>(r.tags||[]).forEach(t=>counts[t]=(counts[t]||0)+1));const top=Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,3);$('practice').innerHTML=top.length?top.map(([t,n])=>`<div class="practice"><b>${esc(t)}（${n}件）</b><br>${esc(PRACTICE[t]||'振り返りをもとに次の練習を決めよう')}</div>`).join(''):'<div class="empty">記録が増えると提案が表示されます</div>';
+  }
+  function exportFile(kind){const filtered=records.filter(r=>!r._pending);let data,type,name;if(kind==='json'){data=JSON.stringify({exported_at:new Date().toISOString(),records:filtered},null,2);type='application/json';name='kizuki-game-note-backup.json'}else{const cols=['event_date','tournament_name','venue','court_no','started_at','player_name','opponent_name','result','scores','reflection','tags','player_comment','entered_by','created_at'];const cell=v=>'"'+String(v??'').replace(/"/g,'""')+'"';data='\ufeff'+[cols.join(','),...filtered.map(r=>cols.map(c=>cell(c==='scores'?scoreText(r):c==='tags'?(r.tags||[]).join('|'):r[c])).join(','))].join('\n');type='text/csv';name='kizuki-game-note.csv'}const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([data],{type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+
+  initOptions();restore();updatePending();renderAll();
+  q('.tab').forEach(b=>b.onclick=()=>{q('.tab').forEach(x=>x.classList.toggle('active',x===b));q('.panel').forEach(x=>x.classList.toggle('active',x.id===b.dataset.tab))});
+  q('.choice').forEach(b=>b.onclick=()=>{reflection=b.dataset.value;q('.choice').forEach(x=>x.classList.toggle('active',x===b))});q('.chip').forEach(b=>b.onclick=()=>{selectedTags.has(b.dataset.tag)?selectedTags.delete(b.dataset.tag):selectedTags.add(b.dataset.tag);b.classList.toggle('active')});
+  $('scoreRows').addEventListener('input',preview);$('gameForm').addEventListener('submit',saveGame);$('cancelEdit').onclick=cancelEditing;document.addEventListener('click',e=>{const edit=e.target.closest('.edit-record'),del=e.target.closest('.delete-record');if(edit)beginEdit(edit.dataset.key);if(del)deleteGame(del.dataset.key)});$('connectBtn').onclick=connect;$('saveEvent').onclick=saveEventSettings;$('editEvent').onclick=editEventSettings;$('cancelEvent').onclick=cancelEventSettings;$('addPlayer').onclick=addPlayer;$('newPlayer').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();addPlayer()}};$('addGame').onclick=addGame;$('filterPlayer').onchange=renderAll;$('filterEnteredBy').onchange=renderAll;$('exportCsv').onclick=()=>exportFile('csv');$('exportJson').onclick=()=>exportFile('json');window.addEventListener('online',()=>{connect();flushQueue()});window.addEventListener('offline',()=>setStatus('offline','オフライン'));
+  if($('supabaseUrl').value&&$('supabaseKey').value)connect();else $('setupCard').open=true;
+})();
+</script>
+</body></html>
