@@ -68,7 +68,7 @@
         <div class="field"><label>試合開始時刻 <span class="hint">（任意）</span></label><input id="startedAt" type="time"></div>
         <div class="field full"><div class="hint">未入力でも保存できます。記録を保存した時刻は自動で残ります。</div></div>
       </div></div>
-      <div class="card"><h2>入力する人・選手</h2><label>入力する保護者</label><div id="observerChoices" class="pick-grid" style="margin-top:7px"></div><label style="display:block;margin-top:14px">試合をした選手</label><div id="playerChoices" class="pick-grid" style="margin-top:7px"></div><div class="addrow"><input id="newPlayer" maxlength="20" placeholder="選手の名前を追加"><button id="addPlayer" class="mini" type="button">追加</button></div><div class="hint">担当は固定しません。見ていた人が入力してください。重複しても保存できます。</div></div>
+      <div class="card"><h2>入力する人・選手</h2><label>入力する保護者</label><div id="observerChoices" class="pick-grid" style="margin-top:7px"></div><label style="display:block;margin-top:14px">試合をした選手</label><div id="playerChoices" class="pick-grid" style="margin-top:7px"></div><div class="addrow"><input id="newPlayer" maxlength="20" placeholder="選手コードを追加"><button id="addPlayer" class="mini" type="button">追加</button></div><div class="hint">個人名は入力せず、選手コードやニックネームを使ってください。担当は固定せず、見ていた人が入力します。</div></div>
       <div class="card"><h2>対戦</h2><div class="field"><label>対戦相手</label><input id="opponent" required autocomplete="off" maxlength="30" placeholder="例：中山さん、〇〇クラブの選手"></div>
       <div style="height:14px"></div><h3>ゲームスコア <span class="hint">（左が選んだ選手）</span></h3><div id="scoreRows"></div><button id="addGame" class="add-game" type="button">＋ ゲームを追加</button><div id="resultPreview" class="hint" style="margin-top:8px">スコアから勝敗を自動判定します</div></div>
       <div class="card"><h2>3タップ振り返り</h2>
