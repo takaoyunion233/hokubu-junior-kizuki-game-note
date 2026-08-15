@@ -159,7 +159,7 @@
     write(STORAGE.queue,remaining);updatePending();if(!remaining.length){toast('送信待ちの記録を共有しました');await loadRecords()}
   }
   function scoresFromForm(){return q('.scores').map(r=>{const a=r.querySelector('.myScore').value,b=r.querySelector('.theirScore').value;return a===''&&b===''?null:{my:Number(a),their:Number(b)}}).filter(Boolean)}
-  function scoreError(){const rows=q('.scores'),partial=rows.some(r=>(r.querySelector('.myScore').value==='')!==(r.querySelector('.theirScore').value===''));if(partial)return '左右両方のゲームスコアを入力してください';const s=scoresFromForm();if(!s.length)return '1ゲーム以上のスコアを入力してください';if(s.some(x=>x.my===x.their))return '同点ではないゲームスコアを入力してください';if(resultOf(s)==='DRAW')return '勝敗が決まるまでスコアを入力してください';return ''}
+  function scoreError(){const rows=q('.scores'),partial=rows.some(r=>(r.querySelector('.myScore').value==='')!==(r.querySelector('.theirScore').value===''));if(partial)return '左右両方のゲームスコアを入力してください';const s=scoresFromForm();if(!s.length)return '1ゲーム以上のスコアを入力してください';if(s.some(x=>x.my===x.their))return '同点ではないゲームスコアを入力してください';';return ''}
   function resultOf(scores){let w=0,l=0;scores.forEach(s=>{if(s.my>s.their)w++;else if(s.my<s.their)l++});return w>l?'WIN':l>w?'LOSE':'DRAW'}
   function preview(){const s=scoresFromForm(),r=resultOf(s);$('resultPreview').textContent=!s.length?'スコアから勝敗を自動判定します':r==='WIN'?'判定：勝ち':r==='LOSE'?'判定：負け':'判定：引き分け'}
   async function saveGame(event){
